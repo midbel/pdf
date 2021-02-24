@@ -1,0 +1,5 @@
+github.com/midbel/hexdump v0.0.0-20210218094232-52de79841a2c h1:AJWQMxAnUncZiifJeQ6jEVO/bGIlMqAGC/yRroTZdlI=
+github.com/midbel/hexdump v0.0.0-20210218094232-52de79841a2c/go.mod h1:gvL0jp+ULLr0YEC2cpCBx2W5di4zULwhr3ABLpc9veQ=
+golang.org/x/text v0.3.5 h1:i6eZZ+zk0SOf0xgBpEpPD18qWcJda6q1sxt3S0kzyUQ=
+golang.org/x/text v0.3.5/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
+golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
