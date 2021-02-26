@@ -10,11 +10,21 @@ import (
 	"github.com/midbel/pdf"
 )
 
+// a range is defined with
+// : = all pages
+// x: = from page X to end of document
+// :x = from begin of a document to page X
+// x:y = from page x to page y (offset can be negative)
+// x,y,z = list of page
+// possible to mix range and individual page
 type Range struct {
 	page int
 }
 
 func (r *Range) Set(str string) (err error) {
+	if str == ":" {
+		return nil
+	}
 	r.page, err = strconv.Atoi(str)
 	return err
 }
@@ -26,7 +36,7 @@ func (r *Range) String() string {
 	return fmt.Sprintf("page #%d", r.page)
 }
 
-func (r *Range) Pages() []int {
+func (r *Range) Pages(n int64) []int {
 	return []int{r.page}
 }
 
@@ -49,7 +59,7 @@ func main() {
 		printDocumentOutline(doc)
 		return
 	}
-	for _, p := range rg.Pages() {
+	for _, p := range rg.Pages(doc.GetCount()) {
 		page, err := doc.GetPage(p)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

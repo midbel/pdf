@@ -161,7 +161,9 @@ func readObject(r *Reader, key []byte, full bool) (Object, error) {
 	if !bytes.Equal([]byte(typ), begobj) {
 		return obj, fmt.Errorf("object keyword %w", ErrMissing)
 	}
-	key = getEncryptionKey(key, oid, rev)
+	if len(key) > 0 {
+		key = getEncryptionKey(key, oid, rev)
+	}
 	obj.Oid = fmt.Sprintf("%d/%d", oid, rev)
 
 	val, err := r.ReadValue(key)

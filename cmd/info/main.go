@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/midbel/pdf"
@@ -42,6 +43,7 @@ func main() {
 			printLine("signed by", fmt.Sprintf("%s (%s)", sig.Who, sig.When.Format(timePattern)))
 		}
 	}
+	printLine("pages", strconv.FormatInt(doc.GetCount(), 10))
 }
 
 func printValue(key string, value pdf.Value) {

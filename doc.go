@@ -59,8 +59,12 @@ func (d *Document) Close() error {
 }
 
 func (d *Document) Walk(fn func(Object) bool) error {
+	return d.walkObjects(false, fn)
+}
+
+func (d *Document) walkObjects(embbeded bool, fn func(Object) bool) error {
 	for _, x := range d.xref {
-		if x.isEmbed() {
+		if !embbeded && x.isEmbed() {
 			continue
 		}
 		obj := d.getObjectWithOid(x.Oid, true)
@@ -199,6 +203,26 @@ func (d *Document) GetOutlines() []Outline {
 	return list
 }
 
+// func (d *Document) GetAnnotations() []string {
+// 	d.walkObjects(true, func(o Object) bool {
+// 		if o.IsAnnotation() {
+// 			fmt.Println(o.Dict)
+// 		}
+// 		return true
+// 	})
+// 	return nil
+// }
+//
+// func (d *Document) GetActions() []string {
+// 	d.walkObjects(true, func(o Object) bool {
+// 		if o.IsAction() {
+// 			fmt.Println(o.Dict)
+// 		}
+// 		return true
+// 	})
+// 	return nil
+// }
+
 func (d *Document) GetCount() int64 {
 	obj := d.getPageRoot()
 	if obj.isZero() {
@@ -207,7 +231,7 @@ func (d *Document) GetCount() int64 {
 	return obj.GetInt("count")
 }
 
-func (d *Document) GetPage(n int) ([]byte, error) {
+func (d *Document) GetPageCode(n int) ([]byte, error) {
 	obj := d.getPageRoot()
 	if obj.isZero() {
 		return nil, fmt.Errorf("empty document")
@@ -231,6 +255,14 @@ func (d *Document) GetPage(n int) ([]byte, error) {
 	return body, nil
 }
 
+func (d *Document) GetPage(n int) ([]byte, error) {
+	body, err := d.GetPageCode(n)
+	if err == nil {
+		body = getPageContent(body)
+	}
+	return body, err
+}
+
 func (d *Document) getPageObject(obj Object, page int) Object {
 	if obj.IsPage() {
 		return obj
@@ -249,7 +281,8 @@ func (d *Document) getPageObject(obj Object, page int) Object {
 		}
 		if count = int(obj.GetInt("count")); page <= count {
 			kids = obj.GetStringArray("kids")
-			return d.getObjectWithOid(kids[page-1], false)
+			obj = d.getObjectWithOid(kids[page-1], false)
+			return obj
 		}
 		page -= count
 	}

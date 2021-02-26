@@ -6,29 +6,6 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"time"
-)
-
-const (
-	nl        = '\n'
-	cr        = '\r'
-	percent   = '%'
-	space     = ' '
-	tab       = '\t'
-	formfeed  = '\f'
-	backspace = '\b'
-	langle    = '<'
-	rangle    = '>'
-	lsquare   = '['
-	rsquare   = ']'
-	lparen    = '('
-	rparen    = ')'
-	pound     = '#'
-	slash     = '/'
-	minus     = '-'
-	plus      = '+'
-	dot       = '.'
-	backslash = '\\'
 )
 
 type Value interface{}
@@ -264,8 +241,10 @@ func parseNumber(r *Reader) (Value, error) {
 	} else {
 		r.UnreadByte()
 	}
-	return strconv.ParseInt(str, 10, 64)
-	// return str, err
+	if n, err := strconv.ParseInt(str, 10, 64); err == nil {
+		return n, err
+	}
+	return strconv.ParseFloat(str, 64)
 }
 
 func parseReference(r *Reader) (string, bool, error) {
@@ -440,76 +419,4 @@ func parseName(r *Reader) (string, error) {
 		str.WriteByte(b)
 	}
 	return "", nil
-}
-
-func skipBlank(r *Reader) {
-	for {
-		b, _ := r.ReadByte()
-		if !isBlank(b) {
-			r.UnreadByte()
-			break
-		}
-	}
-}
-
-func fromHexChar(b byte) (byte, bool) {
-	switch {
-	case b >= '0' && b <= '9':
-		return b - '0', true
-	case b >= 'a' && b <= 'f':
-		return (b - 'a') + 10, true
-	case b >= 'A' && b <= 'F':
-		return (b - 'A') + 10, true
-	}
-	return 0, false
-}
-
-func isLetter(b byte) bool {
-	return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
-}
-
-func isNumber(b byte) bool {
-	return isDigit(b) || isSign(b)
-}
-
-func isSign(b byte) bool {
-	return b == minus || b == plus
-}
-
-func isDigit(b byte) bool {
-	return b >= '0' && b <= '9'
-}
-
-func isHex(b byte) bool {
-	return isDigit(b) || (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'F')
-}
-
-func isSpace(b byte) bool {
-	return b == space || b == tab
-}
-
-func isBlank(b byte) bool {
-	return isSpace(b) || b == cr || b == nl
-}
-
-var timePatterns = []string{
-	"D:20060102150405-0700",
-	"D:20060102150405",
-	"D:20060102150405Z",
-	"D:20060102",
-}
-
-func parseTime(str string) (time.Time, error) {
-	var (
-		when time.Time
-		err  error
-	)
-	str = strings.ReplaceAll(str, "'", "")
-	for _, pat := range timePatterns {
-		when, err = time.Parse(pat, str)
-		if err == nil {
-			break
-		}
-	}
-	return when, err
 }
