@@ -239,7 +239,10 @@ func readString(r *Reader) Token {
 }
 
 func readHex(r *Reader) Token {
-	var str bytes.Buffer
+	var (
+		str bytes.Buffer
+		tmp bytes.Buffer
+	)
 	for r.Len() > 0 {
 		b, _ := r.ReadByte()
 		if b == rangle {
@@ -248,16 +251,21 @@ func readHex(r *Reader) Token {
 			skipBlank(r)
 			continue
 		} else if isHex(b) {
+			tmp.WriteByte(b)
 			c1, _ := fromHexChar(b)
 			b, _ = r.ReadByte()
 			if b == rangle || isBlank(b) {
 				b = '0'
 				r.UnreadByte()
 			}
+			tmp.WriteByte(b)
 			c2, _ := fromHexChar(b)
 			str.WriteByte((c1 << 4) | c2)
 		}
 	}
+
+	fmt.Printf("str: %s\n", str.String())
+	fmt.Printf("tmp: %s\n", tmp.String())
 	return Token{
 		Literal: str.String(),
 		Type:    String,
@@ -308,12 +316,63 @@ const (
 )
 
 var operators = []string{
+	"b",
+	"B",
+	"b*",
+	"B*",
+	"BDC",
+	"BI",
+	"BMC",
 	"BT",
+	"BX",
+	"c",
+	"cm",
+	"CS",
+	"cs",
+	"d",
+	"d0",
+	"d1",
+	"Do",
+	"DP",
+	"EI",
+	"EMC",
 	"ET",
+	"EX",
+	"f",
+	"F",
+	"f*",
+	"G",
+	"g",
+	"gs",
+	"h",
+	"i",
+	"ID",
+	"j",
+	"J",
+	"K",
+	"k",
+	"l",
+	"m",
+	"M",
+	"MP",
+	"n",
+	"q",
+	"Q",
+	"re",
+	"RG",
+	"rg",
+	"ri",
+	"s",
+	"S",
+	"SC",
+	"sc",
+	"SCN",
+	"scn",
+	"sh",
 	"T*",
 	"Tc",
 	"Td",
-	"Td",
+	"TD",
 	"Tf",
 	"Tj",
 	"TJ",
@@ -323,18 +382,13 @@ var operators = []string{
 	"Ts",
 	"Tw",
 	"Tz",
+	"v",
 	"w",
-	"q",
-	"Q",
-	"BDC",
-	"EMC",
+	"W",
+	"W*",
+	"y",
 	"'",
 	"\"",
-	"T*",
-	"re",
-	"W*",
-	"gs",
-	"n",
 }
 
 type Token struct {

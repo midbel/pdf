@@ -40,6 +40,11 @@ func (o Object) ObjectId() (int, int) {
 	return id, rev
 }
 
+func (o Object) IsFont() bool {
+	return o.isType("Font")
+	// return o.isType("FontDescriptor") || o.isType("Font")
+}
+
 func (o Object) IsSignature() bool {
 	return o.isType("Sig")
 }

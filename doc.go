@@ -59,7 +59,7 @@ func (d *Document) Close() error {
 }
 
 func (d *Document) Walk(fn func(Object) bool) error {
-	return d.walkObjects(false, fn)
+	return d.walkObjects(true, fn)
 }
 
 func (d *Document) walkObjects(embbeded bool, fn func(Object) bool) error {

@@ -12,7 +12,11 @@ import (
 )
 
 func main() {
-	var rg Range
+	var (
+		raw bool
+		rg  Range
+	)
+	flag.BoolVar(&raw, "r", raw, "page source")
 	flag.Var(&rg, "p", "page range")
 	flag.Parse()
 	doc, err := pdf.Open(flag.Arg(0))
@@ -26,12 +30,20 @@ func main() {
 		printDocumentOutline(doc)
 		return
 	}
-	printPages(doc, rg)
+	printPages(doc, rg, raw)
 }
 
-func printPages(doc *pdf.Document, rg Range) {
+func printPages(doc *pdf.Document, rg Range, raw bool) {
+	var (
+		page []byte
+		err  error
+	)
 	for _, p := range rg.Pages(doc.GetCount()) {
-		page, err := doc.GetPage(p)
+		if raw {
+			page, err = doc.GetPageCode(p)
+		} else {
+			page, err = doc.GetPage(p)
+		}
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
