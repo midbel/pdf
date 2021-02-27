@@ -17,22 +17,14 @@ func main() {
 		os.Exit(1)
 	}
 	defer doc.Close()
-
-	doc.Walk(func(o pdf.Object) bool {
-		if o.IsFont() {
-			printFont(o)
-		}
-		return true
-	})
+	for _, f := range doc.GetFonts() {
+		printFont(f)
+	}
 }
 
-func printFont(o pdf.Object) {
-	var (
-		name = o.GetString("name")
-		base = o.GetString("basefont")
-		sub  = o.GetString("subtype")
-		enco = o.GetString("encoding")
-		unic = o.Has("tounicode")
-	)
-	fmt.Printf("%7s | %-8s | %-36s | %-16s | %-16s | %t\n", o.Oid, name, base, sub, enco, unic)
+const row = "%-8s | %-36s | %-24s | %-24s | %5t | %c - %c"
+
+func printFont(f pdf.Font) {
+	fmt.Printf(row, f.Name, f.Base, f.Sub, f.Encoding, f.Unicode, f.First, f.Last)
+	fmt.Println()
 }

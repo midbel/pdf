@@ -263,9 +263,6 @@ func readHex(r *Reader) Token {
 			str.WriteByte((c1 << 4) | c2)
 		}
 	}
-
-	fmt.Printf("str: %s\n", str.String())
-	fmt.Printf("tmp: %s\n", tmp.String())
 	return Token{
 		Literal: str.String(),
 		Type:    String,

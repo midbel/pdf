@@ -12,6 +12,17 @@ import (
 	"time"
 )
 
+type Font struct {
+	Name     string
+	Base     string
+	Sub      string
+	Encoding string
+	Unicode  bool
+	Flags    uint32
+	First    byte
+	Last     byte
+}
+
 type Signature struct {
 	Who    string
 	When   time.Time
@@ -59,7 +70,7 @@ func (d *Document) Close() error {
 }
 
 func (d *Document) Walk(fn func(Object) bool) error {
-	return d.walkObjects(true, fn)
+	return d.walkObjects(false, fn)
 }
 
 func (d *Document) walkObjects(embbeded bool, fn func(Object) bool) error {
@@ -84,6 +95,30 @@ func (d *Document) GetLang() string {
 		return ""
 	}
 	return convertString(obj.GetString("lang"))
+}
+
+func (d *Document) GetFonts() []Font {
+	var list []Font
+	d.walkObjects(true, func(o Object) bool {
+		if o.IsFont() {
+			f := Font{
+				Name:     o.GetString("name"),
+				Base:     o.GetString("basefont"),
+				Sub:      o.GetString("subtype"),
+				Encoding: o.GetString("encoding"),
+				Unicode:  o.Has("tounicode"),
+				Flags:    0,
+				First:    byte(o.GetInt("firstchar")),
+				Last:     byte(o.GetInt("lastchar")),
+			}
+			if o := d.getObjectWithOid(o.GetString("fontdescriptor"), false); !o.isZero() {
+				f.Flags = uint32(o.GetInt("flags"))
+			}
+			list = append(list, f)
+		}
+		return true
+	})
+	return list
 }
 
 func (d *Document) GetImage(name string) image.Image {
