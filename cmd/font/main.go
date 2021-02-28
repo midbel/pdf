@@ -22,7 +22,7 @@ func main() {
 	}
 }
 
-const row = "%-8s | %-36s | %-24s | %-24s | %5t | %c - %c"
+const row = "%-8s | %-36s | %-24s | %-24s | %5t | 0x%02x - 0x%02x"
 
 func printFont(f pdf.Font) {
 	fmt.Printf(row, f.Name, f.Base, f.Sub, f.Encoding, f.Unicode, f.First, f.Last)
